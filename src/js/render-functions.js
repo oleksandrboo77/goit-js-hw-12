@@ -29,50 +29,45 @@ export function clearGallery() {
   galleryEl.innerHTML = '';
 }
 
+export function createImageCard({
+  likes,
+  views,
+  comments,
+  downloads,
+  webformatURL,
+  tags,
+  largeImageURL,
+}) {
+  return `
+      <li class="image-card">
+        <a href="${largeImageURL}" class="gallery-link">
+          <img src="${webformatURL}" alt="${tags}" class="image-icon">
+        </a>
+        <div class="image-card-statistic">
+          <div class="image-card-statistic-item">
+            <h2 class="image-likes image-card-statistic-item-title">Likes</h2>
+            <p class="image-card-statistic-item-number">${likes}</p>
+          </div>
+          <div class="image-card-statistic-item">
+            <h2 class="image-views image-card-statistic-item-title">Views</h2>
+            <p class="image-card-statistic-item-number">${views}</p>
+          </div>
+          <div class="image-card-statistic-item">
+            <h2 class="image-comments image-card-statistic-item-title">Comments</h2>
+            <p class="image-card-statistic-item-number">${comments}</p>
+          </div>
+          <div class="image-card-statistic-item">
+            <h2 class="image-downloads image-card-statistic-item-title">Downloads</h2>
+            <p class="image-card-statistic-item-number">${downloads}</p>
+          </div>
+        </div>
+      </li>
+    `;
+}
+
 export function createGallery(images) {
-  const markup = images
-    .map(
-      ({
-        likes,
-        views,
-        comments,
-        downloads,
-        webformatURL,
-        tags,
-        largeImageURL,
-      }) =>
-        `
-    <li class="image-card">
-<a href="${largeImageURL}" class="gallery-link">
-    <img src="${webformatURL}" alt="${tags}" class="image-icon">
-</a>
-  <div class="image-card-statistic">
+  const markup = images.map(createImageCard).join('');
 
-    <div class="image-card-statistic-item">
-      <h2 class="image-likes image-card-statistic-item-title">Likes</h2>
-      <p class="image-card-statistic-item-number">${likes}</p>
-    </div>
-
-    <div class="image-card-statistic-item">
-      <h2 class="image-views image-card-statistic-item-title">Views</h2>
-      <p class="image-card-statistic-item-number">${views}</p>
-    </div>
-
-    <div class="image-card-statistic-item">
-      <h2 class="image-comments image-card-statistic-item-title">Comments</h2>
-      <p class="image-card-statistic-item-number">${comments}</p>
-    </div>
-
-    <div class="image-card-statistic-item">
-      <h2 class="image-downloads image-card-statistic-item-title">Downloads</h2>
-      <p class="image-card-statistic-item-number">${downloads}</p>
-    </div>
-
-  </div>
-
-    </li> `
-    )
-    .join('');
   galleryEl.innerHTML = markup;
   lightbox.refresh();
 }
@@ -81,4 +76,6 @@ export function showLoadMoreButton() {
   loadMoreEl.classList.replace('load-more-hidden', 'load-more');
 }
 
-function hideLoadMoreButton() {}
+export function hideLoadMoreButton() {
+  loadMoreEl.classList.replace('load-more', 'load-more-hidden');
+}

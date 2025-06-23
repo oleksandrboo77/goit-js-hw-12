@@ -11,7 +11,9 @@ import {
   galleryEl,
   loadMoreEl,
   showLoadMoreButton,
+  hideLoadMoreButton,
   state,
+  createImageCard,
 } from './js/render-functions';
 
 const formEl = document.querySelector('.form');
@@ -57,7 +59,8 @@ function handleSubmit(event) {
       state.totalLoaded = data.length;
       state.totalHits = data.totalHits;
 
-      if (state.totalLoaded >= state.totalHits) {
+      const totalPages = Math.ceil(state.totalHits / 15);
+      if (state.page >= totalPages) {
         hideLoadMoreButton();
         iziToast.info({
           title: 'Info',
@@ -83,12 +86,15 @@ function handleSubmit(event) {
 async function loadMoreClick() {
   showLoader();
   state.page += 1;
+
   try {
     const moreImages = await getImagesByQuery(state.currentQuery);
 
     state.totalLoaded += moreImages.length;
 
-    if (state.totalLoaded >= state.totalHits) {
+    const totalPages = Math.ceil(state.totalHits / 15);
+
+    if (state.page >= totalPages) {
       hideLoadMoreButton();
       iziToast.info({
         title: 'Info',
@@ -98,6 +104,7 @@ async function loadMoreClick() {
     }
 
     if (!moreImages || moreImages.length === 0) {
+      hideLoadMoreButton();
       iziToast.info({
         title: 'Info',
         message: 'No more images found.',
@@ -106,50 +113,9 @@ async function loadMoreClick() {
       return;
     }
 
-    const markup = moreImages
-      .map(
-        ({
-          likes,
-          views,
-          comments,
-          downloads,
-          webformatURL,
-          tags,
-          largeImageURL,
-        }) =>
-          `
-      <li class="image-card">
-  <a href="${largeImageURL}" class="gallery-link">
-      <img src="${webformatURL}" alt="${tags}" class="image-icon">
-  </a>
-    <div class="image-card-statistic">
-  
-      <div class="image-card-statistic-item">
-        <h2 class="image-likes image-card-statistic-item-title">Likes</h2>
-        <p class="image-card-statistic-item-number">${likes}</p>
-      </div>
-  
-      <div class="image-card-statistic-item">
-        <h2 class="image-views image-card-statistic-item-title">Views</h2>
-        <p class="image-card-statistic-item-number">${views}</p>
-      </div>
-  
-      <div class="image-card-statistic-item">
-        <h2 class="image-comments image-card-statistic-item-title">Comments</h2>
-        <p class="image-card-statistic-item-number">${comments}</p>
-      </div>
-  
-      <div class="image-card-statistic-item">
-        <h2 class="image-downloads image-card-statistic-item-title">Downloads</h2>
-        <p class="image-card-statistic-item-number">${downloads}</p>
-      </div>
-  
-    </div>
-  
-      </li> `
-      )
-      .join('');
-    galleryEl.insertAdjacentHTML('beforeend', markup);
+    const extraMarkup = moreImages.map(createImageCard).join('');
+
+    galleryEl.insertAdjacentHTML('beforeend', extraMarkup);
     lightbox.refresh();
 
     const { height: cardHeight } = document
