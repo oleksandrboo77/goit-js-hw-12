@@ -67,7 +67,6 @@ export function createImageCard({
 
 export function createGallery(images) {
   const markup = images.map(createImageCard).join('');
-
   galleryEl.innerHTML = markup;
   lightbox.refresh();
 }
@@ -78,4 +77,10 @@ export function showLoadMoreButton() {
 
 export function hideLoadMoreButton() {
   loadMoreEl.classList.replace('load-more', 'load-more-hidden');
+}
+
+export function appendToGallery(images) {
+  const markup = images.map(createImageCard).join('');
+  galleryEl.insertAdjacentHTML('beforeend', markup);
+  lightbox.refresh();
 }
